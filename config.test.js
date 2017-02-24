@@ -33,7 +33,7 @@ module.exports = {
       __go2pageNum_Init: 0,
       initUrl: 'http://www.zjfda.gov.cn/sjcx/qxjy_xzspsearch.jsp',
       detailPageBase: 'http://www.zjfda.gov.cn/sjcx',
-      aliveLoadFlag: 'wen1'
+      aliveLoadFlag: 'table'
     }
   },
 

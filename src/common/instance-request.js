@@ -72,14 +72,14 @@ const get = function(url, loadFlag) {
         load: 'error',
       });
     }
-    // else {
-    //   //cookieHelper.addResCookieToCookies(ret.res, cookies);
-    //   return Promise.resolve({
-    //     load: 'success',
-    //     res: ret.res,
-    //     body: ''
-    //   });
-    // }
+    else {
+      //cookieHelper.addResCookieToCookies(ret.res, cookies);
+      return Promise.resolve({
+        load: 'error',
+        res: '',
+        body: ''
+      });
+    }
 
   });
 };
@@ -92,7 +92,7 @@ const get = function(url, loadFlag) {
  * @param  {String} loadFlag [此url爬取到的标志]
  * @return {Object} formContent [post content]
  */
-const post = function(url, formContent, cookies, loadFlag) {
+const post = function(url, formContent, headers={}, loadFlag) {
   if(!url || !formContent){
     throw new Error('Url or formContent not exiting');
   }
@@ -104,9 +104,7 @@ const post = function(url, formContent, cookies, loadFlag) {
       request.post({
         url: encodeURI(url),
         gzip: true,
-        headers: {
-          Cookie: cookieHelper.cookiesToString(cookies)
-        },
+        headers,
         form: formContent,
         encoding: null
       }, function(err, httpResponse, body) {
@@ -133,27 +131,19 @@ const post = function(url, formContent, cookies, loadFlag) {
     if(ret.body.indexOf(loadFlag) !== -1) {
       return Promise.resolve({
         load: 'success',
-        res: ret.httpResponse,
-        body: ret.body
+        response: ret.httpResponse,
+        body: ret.body,
       });
     }
-    else if(ret.body.indexOf('405') !== -1 || ret.body.indexOf('Method Not Allowed') !== -1) {
+    else{
       return Promise.resolve({
-        load: 'error'
-      });
-    }
-    else {
-    //   cookieHelper.addResCookieToCookies(ret.httpResponse, cookies);
-      return Promise.resolve({
-        load: 'error',
+        load: 'fail',
+        response: ret.httpResponse
       });
     }
 
   });
 };
-
-
-
 
 module.exports = {
   get,

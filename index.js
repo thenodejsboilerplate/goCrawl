@@ -1,9 +1,9 @@
 'use strict';
 require('app-module-path').addPath(__dirname);
 require('src/boot');
-const cluster = require('cluster');
-const co = require('co');
-const errorDebug = require('debug')('error');
+//const cluster = require('cluster');
+//const co = require('co');
+//const errorDebug = require('debug')('error');
 const coHandler = require('src/common/co-handler');
 const config = require('src/common/get-config');
 const crawlers = config.crawlers;

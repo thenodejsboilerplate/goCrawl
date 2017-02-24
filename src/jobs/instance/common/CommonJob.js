@@ -5,11 +5,9 @@ const {post, get} = require('src/common/instance-request');
 const coHandler = require('src/common/co-handler');
 const debug = require('debug')('debug');
 const config = require('src/common/get-config');
+const cheerio = require('cheerio');
 
 const CorpDetailHref = require('src/models/instance/Href');
-let cookies = {
-  JSESSIONID: 'abcLJDZ0-EQfA6Gt9DkPv'
-};
 
 class CommonJob {
 
@@ -19,7 +17,7 @@ class CommonJob {
 
   doneStatus(Model, crawlNumber){
     const self = this;
-    coHandler(function* (){
+    return coHandler(function* (){
       let exactCount = yield Model.find().count().exec();
       let counter = 0;
       if(crawlNumber !== exactCount) {
@@ -34,8 +32,8 @@ class CommonJob {
 
   tryAgainIfFail (Model, crawlNumber,that) {
     const self = this;
-    coHandler(function*(){
-      let done = self.doneStatus(Model, crawlNumber);
+    return coHandler(function*(){
+      let done = yield self.doneStatus(Model, crawlNumber);
       let counter = 0;
       if(!done){
         if(counter>5){
@@ -43,30 +41,65 @@ class CommonJob {
         }
         yield that.start();
         counter++;
-        self.tryAgainIfFail();
+        self.tryAgainIfFail(Model, crawlNumber,that);
       }
-      return;
+      return Promise.resolve();;
       
     });
 
   }
 
+  /**
+   * @return Promise
+   */
+  isAlive (url, formContent,headers, loadFlag) {
+    const self = this;
+    return coHandler(function* (){
+      let body;
+      try{
+        body = yield self.getBody(url,formContent,headers, loadFlag);
+        if(body.includes('NDATA_')){
+          return Promise.resolve(false);
+        }
+      }catch(err){
+        return Promise.resolve(false);
+      }
+      
+      let alive = body.includes(loadFlag);
+      if(alive){
+        return Promise.resolve(true);
+      }else{
+        Promise.resolve(false);
+      }
+      
+    });
 
-  getBody(url,formContent, loadFlag) {
+
+  }
+
+
+  getBody(url,formContent, headers, loadFlag) {
     const self = this;
     return coHandler(function *() {
       debug('into getBody');
-      const ret = yield post(url, formContent, cookies, loadFlag);
+      const ret = yield post(url, formContent, headers, loadFlag);
 
       if(ret.load === 'success') {
         return Promise.resolve(ret.body);
       }
       else if(ret.load === 'error') {
-        throw new Error('URL_REQUEST_ERROR');
+        let code = ret.response.statusCode; 
+        if(code === 200){
+          return Promise.resolve('NDATA_NO_REQUIRED_DATA!');
+        }else if(code === 401) {
+          return Promise.resolve('NDATA_UNAUTHORIZED!');
+        }else if(code === 404){
+          return Promise.resolve('NDATA_NOT_FOUND!');
+        }else{
+          return Promise.resolve('NDATA_REQUEST_FAIL!');
+        }
       }
-      else {
-        throw new Error('CAN_NOT_REQUEST');
-      }
+
     });
   }
 
@@ -94,7 +127,7 @@ class CommonJob {
   }
 
 
-  getCount(url, loadFlag){
+  getCount(url, headers={}, loadFlag){
     const self = this;
     return coHandler(function *(){
       let res = {};
@@ -106,7 +139,7 @@ class CommonJob {
         __go2pageNum: self.config.__go2pageNum_Init
       };
 
-      let body = yield self.getBody(url, formContent, loadFlag);
+      let body = yield self.getBody(url, formContent, headers, loadFlag);
 
       res.corpCount = parseInt(body.match(/共(\d+)条/)[1]);
       res.pageCount = parseInt(body.match(/第\d\/(\d+)页/)[1]);

@@ -50,12 +50,25 @@ class KeepFormData extends CommonJob {
     const loadFlag = this.config.aliveLoadFlag;
 
     return coHandler(function*(){
-      let getCountRes = yield self.getCount(self.config.initUrl,loadFlag);
+
+     // let isAlive = self.isAlive(self.config.initUrl,);
+      let getCountRes = yield self.getCount(self.config.initUrl, {}, loadFlag);
       debug('below getCountRes');
       let lengths = getCountRes.pageCount;
       debug(`page account is ${lengths}`);
 
       for(let i=0;i<=lengths-1;i++){
+        //skip if the page isn't accessible
+        let formContent = {};
+        formContent.__go2pageNO = i + 1;
+        formContent.__go2pageNum = i;
+        let alive = yield self.isAlive(self.config.initUrl, formContent, {}, loadFlag);
+        console.log(i+1, 'page\'s alive status is '+ alive);
+        if(!alive){
+          console.log(`Page ${i+1} is not accessible!Skip it..`);
+          continue;
+        }
+
         debug('keeping all the form data needed to get each page in the db ');
         let exist = yield FormData.findOne({doneRecord: true,__go2pageNO: i+1}).exec();
         debug(`exist: ${exist}`);
@@ -64,13 +77,7 @@ class KeepFormData extends CommonJob {
           debug('exits, skip it..');
           continue;
         }else{
-          let formContent = {};
-          formContent.__go2pageNO = i + 1;
-          formContent.__go2pageNum = i;
           let whichPageIs = yield self.whichPage(formContent,self.config.initUrl,self.config.loadFlag);
-          if(whichPageIs === 24){
-            continue;
-          }
           let formData = new FormData(formContent);
           
           formData.doneRecord = true;

@@ -1,5 +1,5 @@
 'use strict';
-const path = require('path');
+// const path = require('path');
 const config = require('src/common/get-config');
 
 
@@ -8,7 +8,7 @@ const {format} = require('util');
 
 const cheerio = require('cheerio');
 const coHandler = require('src/common/co-handler');
-const loadFlag = 'wen1';
+// const loadFlag = 'wen1';
 const FormData = require('src/models/instance/FormData'); 
 const Href = require('src/models/instance/Href');
 const CorpDetail = require('src/models/instance/CorpDetail');
@@ -66,7 +66,7 @@ class GetCorpDetail extends CommonJob {
         const loadFlag = self.config.loadFlag;
         let whichPageIs = yield self.whichPage(formContent,initUrl,loadFlag);
 
-        let body = yield self.getBody(initUrl, formContent, loadFlag);
+        let body = yield self.getBody(initUrl, formContent,{}, loadFlag);
           //debug(`body in every page: ${body}`);
 
           //storing href got from each page..
@@ -171,7 +171,7 @@ class GetCorpDetail extends CommonJob {
         debug(`successfully keeping ${corNameValue}'s data  into the db...`);
       }
 
-      yield self.tryAgainIfFail(CorpDetail,6135 ,self)     
+      yield self.tryAgainIfFail(CorpDetail,6135 ,self);    
     });
 
     
