@@ -79,11 +79,31 @@ class KeepFormData extends CommonJob {
           debug('successfully keeping one data to the db. Next..');
         }
       }
+      yield self.tryAgainIfFail(FormData,307 ,self);    
       return Promise.resolve();
       
 
     });
   }
+
+  // tryAgainIfFail () {
+  //   const self = this;
+  //   coHandler(function*(){
+  //     let done = this.doneStatus(FormData, self.config.crawlNnumber.formData);
+  //     let counter = 0;
+  //     if(!done){
+  //       if(counter>5){
+  //         return;
+  //       }
+  //       yield self.start();
+  //       counter++;
+  //       self.tryAgainIfFail();
+  //     }
+  //     return;
+      
+  //   });
+
+  // }
 
 }
 

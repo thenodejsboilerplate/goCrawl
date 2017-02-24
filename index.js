@@ -10,13 +10,13 @@ const crawlers = config.crawlers;
 const keys = Object.keys(crawlers);
 
 function startJob(job) {
-  return co(function *() {
+  return coHandler(function *() {
     yield job.start();
-  })
-  .catch(e => {
-    errorDebug(e);
-    process.exit(-1);
   });
+  // .catch(e => {
+  //   errorDebug(e);
+  //   process.exit(-1);
+  // });
 }
 coHandler(function *() {
   for(let key of keys) {
@@ -32,14 +32,10 @@ coHandler(function *() {
       }
 
       for(let job of jobs) {
-        startJob(job);
+        yield startJob(job);
       }
     }
   }
-})
-.catch(function(e) {
-  errorDebug(e);
-  process.exit();
 });
 
 

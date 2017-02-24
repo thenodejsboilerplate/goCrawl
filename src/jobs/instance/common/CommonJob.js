@@ -17,6 +17,41 @@ class CommonJob {
     this.config = config;
   }
 
+  doneStatus(Model, crawlNumber){
+    const self = this;
+    coHandler(function* (){
+      let exactCount = yield Model.find().count().exec();
+      let counter = 0;
+      if(crawlNumber !== exactCount) {
+        debug('the exact number crawled is not the same as it should be! we are restarting to crawl..');
+        return false;
+      }
+      debug('Complete Crawling!');
+      return true;
+
+    });
+  }
+
+  tryAgainIfFail (Model, crawlNumber,that) {
+    const self = this;
+    coHandler(function*(){
+      let done = self.doneStatus(Model, crawlNumber);
+      let counter = 0;
+      if(!done){
+        if(counter>5){
+          return;
+        }
+        yield that.start();
+        counter++;
+        self.tryAgainIfFail();
+      }
+      return;
+      
+    });
+
+  }
+
+
   getBody(url,formContent, loadFlag) {
     const self = this;
     return coHandler(function *() {

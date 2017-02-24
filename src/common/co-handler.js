@@ -5,6 +5,7 @@ let logger = require('src/common/bunyanLogger');
 module.exports = function (handle){
   return co(handle).catch(function(err){
     logger.error(err);
+    process.exit(-1);
     return;
   });
 };

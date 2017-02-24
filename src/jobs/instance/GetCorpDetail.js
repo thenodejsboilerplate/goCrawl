@@ -169,10 +169,37 @@ class GetCorpDetail extends CommonJob {
         doc.done = true;
         yield doc.save();
         debug(`successfully keeping ${corNameValue}'s data  into the db...`);
-      }     
+      }
+
+      yield self.tryAgainIfFail(CorpDetail,6135 ,self)     
     });
 
+    
+
   }
+
+  // tryAgainIfFail () {
+  //   const self = this;
+  //   coHandler(function*(){
+  //     let done = this.doneStatus(CorpDetail, config.crawlNnumber);
+  //     let counter = 0;
+  //     if(!done){
+  //       if(counter>5){
+  //         return;
+  //       }
+  //       yield self.start();
+  //       counter++;
+  //       self.tryAgainIfFail();
+  //     }
+  //     return;
+      
+  //   });
+
+  // }
+
+
+
+
 }
 
 module.exports = GetCorpDetail;
