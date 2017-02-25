@@ -4,6 +4,7 @@ const co = require('co');
 const {post, get} = require('src/common/instance-request');
 const coHandler = require('src/common/co-handler');
 const debug = require('debug')('debug');
+const logger = require('src/common/bunyanLogger');
 const config = require('src/common/get-config');
 const cheerio = require('cheerio');
 
@@ -39,18 +40,21 @@ class CommonJob {
         if(counter>5){
           return;
         }
+        console.log('we have pages left.so we restart crawling..');
         yield that.start();
         counter++;
-        self.tryAgainIfFail(Model, crawlNumber,that);
+        return self.tryAgainIfFail(Model, crawlNumber,that);
       }
-      return Promise.resolve();;
+      return Promise.resolve();
       
     });
 
   }
 
   /**
+   * to check if the page you are crawling contains the data you want and is accesible
    * @return Promise
+   * 
    */
   isAlive (url, formContent,headers, loadFlag) {
     const self = this;
@@ -90,12 +94,16 @@ class CommonJob {
       else if(ret.load === 'error') {
         let code = ret.response.statusCode; 
         if(code === 200){
+          logger.error(`NDATA_NO_REQUIRED_DATA: when getting ${url} page content!`);
           return Promise.resolve('NDATA_NO_REQUIRED_DATA!');
         }else if(code === 401) {
+          logger.error(`NDATA_UNAUTHORIZED: when getting ${url} page content!`);
           return Promise.resolve('NDATA_UNAUTHORIZED!');
         }else if(code === 404){
+          logger.error(`NDATA_NOT_FOUND: when getting ${url} page content!`);
           return Promise.resolve('NDATA_NOT_FOUND!');
         }else{
+          logger.error(`NDATA_REQUEST_FAIL: when getting ${url} page content!`);
           return Promise.resolve('NDATA_REQUEST_FAIL!');
         }
       }
@@ -149,6 +157,26 @@ class CommonJob {
       return Promise.resolve(res);
     });
   }
+
+  // getLeftRecords(Model, loadFlag) {
+  //   const self = this;
+  //   return coHandler(function *(){
+  //     let failedRecords = yield Model.find({doneRecord: false}).exec();
+  //     let crawledCount = yield Model.find({doneRecord: true}).count().exec();
+  //     if(failedRecords){
+  //       return Promise.resolve(crawledCount);
+  //     }
+
+  //     let getCountRes = yield self.getCount(self.config.initUrl, {}, loadFlag);
+  //     debug('below getCountRes');
+  //     let lengths = getCountRes.pageCount;
+  //     debug(`page account is ${lengths}`);
+     
+  //     return Promise.resolve(lengths);
+
+  //   });
+    
+  // }
 
 
   whichPage(option,url,loadFlag){

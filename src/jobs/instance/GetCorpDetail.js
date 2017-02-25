@@ -1,3 +1,4 @@
+console.log('into GetCorpDetail #top');
 'use strict';
 // const path = require('path');
 const config = require('src/common/get-config');
@@ -50,8 +51,10 @@ class GetCorpDetail extends CommonJob {
 
   start() {
     const self = this;
+    console.log('into GetCorpDetail #start method');
     debug('finish keeping form data..');
     return coHandler(function*(){
+      console.log('into GetCorpDetail #start method coHandler');
       let formDatas = FormData.find({doneRecord: true,done: false}).cursor();
         
       for(let doc = yield formDatas.next(); doc != null; doc = yield formDatas.next()){

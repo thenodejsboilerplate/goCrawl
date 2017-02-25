@@ -30,7 +30,7 @@ const infoStream = process.env.NODE_ENV === 'production'? new SpecificLevelStrea
 const errorStream = process.env.NODE_ENV === 'production'? new SpecificLevelStream(['error'], { path: 'logs/error.log' }): new SpecificLevelStream(['error'], process.stderr);
 
 module.exports = bunyan.createLogger({
-  name: 'backend-boilerplate',
+  name: 'crawler-boilerplate',
   streams: [
     {
       type: 'raw',

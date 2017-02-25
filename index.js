@@ -24,6 +24,7 @@ coHandler(function *() {
     if(crawler.run === true) {
       const jobs = [];
       const jobFiles = Object.keys(crawler.jobsConfig);
+      console.log(`jobFiles: ${require('util').inspect(jobFiles)}`);
 
       for(let jobFile of jobFiles) {
         const Job = require(jobFile);
@@ -32,7 +33,10 @@ coHandler(function *() {
       }
 
       for(let job of jobs) {
+        let i = 1;
+        console.log('into turn'+ i);
         yield startJob(job);
+        i++;
       }
     }
   }
