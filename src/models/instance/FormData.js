@@ -11,7 +11,6 @@ const FormDataSchema = new mongoose.Schema({
   done: {type: Boolean, default: false},
   doneRecord: {type: Boolean, default: false},
 });
-
 let FormData;
 if (mongoose.models.FormData) {
   FormData =  mongoose.model('FromData');

@@ -1,11 +1,10 @@
-'use strict';
-const request = require('request');
-const debug = require('debug')('debug');
-const debugBody = require('debug')('body');
-const iconv = require('iconv-lite');
-//const cookieHelper = require('./cookie-helper');
-const coWrapper = require('./co-wrapper');
-
+'use strict'
+const request = require('request')
+const debug = require('debug')('debug')
+const debugBody = require('debug')('body')
+const iconv = require('iconv-lite')
+// const cookieHelper = require('./cookie-helper');
+const coWrapper = require('./co-wrapper')
 
 // /**
 //  * @param  {String} url      [请求url]
@@ -31,9 +30,6 @@ const coWrapper = require('./co-wrapper');
 //     });
 //   });
 // };
-
-
-
 
 // /**
 //  * @param  {String} url      [要爬取的sfda地址]
@@ -81,7 +77,6 @@ const coWrapper = require('./co-wrapper');
 //   });
 // };
 
-
 /**
  * @param  {String} url      [请求url]
  * @param  {Object} querystring [请求query参数]
@@ -92,46 +87,40 @@ const coWrapper = require('./co-wrapper');
  * @param  {Object} gzip [If true, add an Accept-Encoding header to request compressed content encodings from the server (if not already present) and decode supported content encodings in the response.]
  * @return {Promise}
  */
-const getOrPost = function(url, method='GET', queryString = {},formData = {}, headers = {}, loadFlag = '', encoding = 'UTF-8', gzip = false) {
-  
-  return coWrapper(function* (){
+const requestMethod = function ({url, method = 'GET', queryString = {}, formData = {}, headers = {}, loadFlag = '', encoding = 'UTF-8', gzip = false}) {
+  return coWrapper(function * () {
     let result = yield new Promise((resolve, reject) => {
-      url = encodeURI(url);
+      url = encodeURI(url)
       request({
         method: method,
         url,
         headers,
-        qs: queryString,//object containing querystring values to be appended to the uri
-        formData, //Data to pass for a multipart/form-data request. See Forms section above.
+        qs: queryString, // object containing querystring values to be appended to the uri
+        formData, // Data to pass for a multipart/form-data request. See Forms section above.
         gzip,
         encoding: null
-      }, function(err, httpResponse, body) {
-
-        if(err)
-          reject(err);
-        else{
-          body = iconv.decode(body, encoding);
-          debug('body is'+body);
-          resolve({httpResponse, body});
+      }, function (err, httpResponse, body) {
+        if (err) { reject(err) } else {
+          body = iconv.decode(body, encoding)
+          debug('body is' + body)
+          resolve({httpResponse, body})
         }
+      })
+    })
 
-            
-      });
-    });
+    debug(result.body.indexOf(loadFlag) !== -1)
+    debugBody(result.body)
 
-    debug(result.body.indexOf(loadFlag) !== -1);
-    debugBody(result.body);
-    
-    if(result.body.indexOf(loadFlag) !== -1) {
+    if (result.body.indexOf(loadFlag) !== -1) {
       return Promise.resolve({
         load: 'success',
         res: result.httpResponse,
         body: result.body
-      });
+      })
     } else {
       return Promise.resolve({
         load: 'error'
-      });
+      })
     }
     // else if(result.body.indexOf('405') !== -1 || ret.body.indexOf('Method Not Allowed') !== -1) {
     //   return Promise.resolve({
@@ -141,14 +130,9 @@ const getOrPost = function(url, method='GET', queryString = {},formData = {}, he
     // else {
     //   cookieHelper.addResCookieToCookies(result.httpResponse, cookies);
     // }
-
-  });
-  
-};
-
-
-
+  })
+}
 
 module.exports = {
-  getOrPost
-};
+  requestMethod
+}

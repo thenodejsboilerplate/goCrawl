@@ -1,2 +1,2 @@
-'use strict';
-require('src/common/mongoose-connect');
+'use strict'
+require('src/common/mongoose-connect')
