@@ -15,7 +15,27 @@ module.exports = {
   },
   crawlers: {
     // add your crawlers
-
+    instance: {
+      run: true, //是否启动该爬虫
+      strategy: 'continue', //爬虫策略 restart or continue
+      website: 'zjfda',
+      identifier: 'myInstance',
+      jobsConfig: {
+        'src/jobs/instance/KeepFormData.js': {
+        },
+        'src/jobs/instance/GetCorpDetail.js': {
+        }
+      },
+      // jobStatus: {
+      //   qxjyJob: false,
+      //   keepFromData: false,
+      // },
+      __go2pageNO_Init: 1,
+      __go2pageNum_Init: 0,
+      initUrl: 'http://www.zjfda.gov.cn/sjcx/qxjy_xzspsearch.jsp',
+      detailPageBase: 'http://www.zjfda.gov.cn/sjcx',
+      aliveLoadFlag: 'table'
+    }
   }
 
 }
