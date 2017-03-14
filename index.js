@@ -6,7 +6,6 @@ const coHandler = require('src/common/co-handler')
 const config = require('src/common/get-config')
 const crawlers = config.crawlers
 const keys = Object.keys(crawlers)// instance's name
-const JSON5 = require('json5')
 
 function startJob (job) {
   return coHandler(function * () {
@@ -48,7 +47,7 @@ if (cluster.isMaster) {
             for (let i = 0; i < crawler.jobsConfig[jobFile].count; i++) {
               const env = {
                 jobFile,
-                config: JSON5.stringify(crawler)
+                config: JSON.stringify(crawler)
               }
               const worker = cluster.fork(env)// put env as an env variable and can be reached in the work process
               workers[worker.id] = env// for use in the exist handler
@@ -69,7 +68,7 @@ if (cluster.isMaster) {
    if(!process.env.config) {
      return
    }
-   let config = JSON5.parse(process.env.config)
+   let config = JSON.parse(process.env.config)
     
     const jobFile = process.env.jobFile
     const Job = require(jobFile)
