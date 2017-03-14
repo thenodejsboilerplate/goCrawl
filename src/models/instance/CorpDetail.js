@@ -1,5 +1,5 @@
-'use strict';
-const mongoose = require('mongoose');
+'use strict'
+const mongoose = require('mongoose')
 
 const CorpDetailSchema = new mongoose.Schema({
 //  / crawlerLocation: {type: String, default: 'qxjy'},
@@ -15,14 +15,14 @@ const CorpDetailSchema = new mongoose.Schema({
   expire: {type: String, default: ''},
   location: {type: String, default: ''},
   done: {type: Boolean, default: false}
-});
+})
 
-let CorpDetail;
+let CorpDetail
 if (mongoose.models.CorpDetail) {
-  CorpDetail =  mongoose.model('CorpDetail');
+  CorpDetail = mongoose.model('CorpDetail')
 } else {
-  CorpDetail =  mongoose.model('CorpDetail', CorpDetailSchema);
+  CorpDetail = mongoose.model('CorpDetail', CorpDetailSchema)
 }
-//const CorpDetail = mongoose.model('CorpDetail', CorpDetailSchema);
+// const CorpDetail = mongoose.model('CorpDetail', CorpDetailSchema);
 
-module.exports = CorpDetail;
+module.exports = CorpDetail

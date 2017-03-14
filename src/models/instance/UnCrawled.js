@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const unCrawledFormDataSchema = new mongoose.Schema({
-  identifier: {type: String, default: 'myInstance'},
+  location: {type: String, default: 'myInstance'},
   __go2pageNO: Number,
   leibie: {type: String, default: 'CORP_NAME'},
   key1: {type: String, default: ''},

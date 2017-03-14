@@ -10,7 +10,9 @@
     "co": "^4.6.0",
     "debug": "^2.3.3",
     "iconv-lite": "^0.4.15",
+    "json5": "0.5.1",
     "mongoose": "^4.7.1",
+    "nightmare": "^2.10.0",
     "pow-mongodb-fixtures": "^0.14.0",
     "request": "^2.79.0",
     "should": "^11.1.1"

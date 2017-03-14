@@ -18,7 +18,7 @@ module.exports = {
       run: true, //是否启动该爬虫
       strategy: 'continue', //爬虫策略 restart or continue
       website: 'zjfda',
-      identifier: 'myInstance',
+      location: 'myInstance',
       jobsConfig: {
         'src/jobs/instance/KeepFormData.js': {
         },
