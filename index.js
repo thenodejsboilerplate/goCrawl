@@ -65,18 +65,16 @@ if (cluster.isMaster) {
 } else {
   // * cluster.isWorker */
   coHandler(function * () {
-    //let configs = require('util').inspect(process.env.config)
-    //console.log('process.env.confg' + configs)
+
    if(!process.env.config) {
      return
    }
    let config = JSON5.parse(process.env.config)
     
     const jobFile = process.env.jobFile
-    //console.log(`jobFile: ${jobFile} config: ${config}`)
     const Job = require(jobFile)
     const job = new Job(config)
 
-    yield startJob(job)// worker runs according to the config in the env variables
+    yield startJob(job) // worker runs according to the config in the env variables
   })
 }
