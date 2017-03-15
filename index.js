@@ -64,12 +64,10 @@ if (cluster.isMaster) {
 } else {
   // * cluster.isWorker */
   coHandler(function * () {
-
-   if(!process.env.config) {
-     return
-   }
-   let config = JSON.parse(process.env.config)
-    
+    if (!process.env.config) {
+      return
+    }
+    let config = JSON.parse(process.env.config)
     const jobFile = process.env.jobFile
     const Job = require(jobFile)
     const job = new Job(config)
