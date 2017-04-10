@@ -2,36 +2,36 @@
 const coHandler = require('src/common/co-handler')
 const Common = require('src/classes/CommonJob')
 const cheerio = require('cheerio')
+const logger = require('src/common/bunyanLogger')
 const nightmare = require('src/common/nightmare')
-// const logger = require('src/common/bunyanLogger')
+// const specCommonJob = require('src/jobs/chinajob/common/CommonJob')
 
 class CommonJob extends Common {
   constructor (config) {
     super(config)
     this.config = config
   }
-
+  
   getCount (url) {
-    const self = this
+    let self = this
     return coHandler(function * () {
       let res = {}
       const html = yield self.getHTML(url, 'postList')
       const $ = cheerio.load(html)
-
-      res.totalPageCount = $('.pagerselect>option:last-child').attr('value').trim()
-      res.postCount = $('tbody tr').text().match(/Total (\d+) Records/)[1].trim()
-      console.log('res' + res.totalPageCount, res.postCount)
+      res.totalPageCount = $('#LblTotaltPage').text().trim()
+      res.postCount = $('#LblTotalInfos').text().trim()
       return Promise.resolve(res)
     })
   }
 
+
   getHTML (url, which) {
     // const self = this
     let selector
-    if (which === 'jobPost') {
-      selector = '#__01'
-    } else if (which === 'postList') {
-      selector = 'form[name="common"]'
+    if (which === 'postList') {
+      selector = '.cn_txtlan1'
+    } else if (which === 'postDetail') {
+      selector = '#form1'
     }
     return coHandler(function * () {
       let html
@@ -43,16 +43,11 @@ class CommonJob extends Common {
                     return document.getElementsByTagName('body')[0].innerHTML
                   })
       } catch (e) {
-        console.error(`cannot get html:${e}`)
+        logger.error(`cannot get html:${e}`)
         return Promise.reject(e)
       }
-      console.log('dne')
       return Promise.resolve(html)
     })
-  }
-  // next prototype methods
-  replaceColon (value = '') {
-    return value.replace(/^:/, '')
   }
 }
 

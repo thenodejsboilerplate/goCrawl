@@ -3,7 +3,7 @@ const coHander = require('src/common/co-handler')
 
 const Crawler = require('src/models/Crawler')
 
-class SfdaBoot {
+class Boot {
   constructor (config) {
     this.config = config
   }
@@ -17,7 +17,6 @@ class SfdaBoot {
           yield Crawler.remove({}).exec()
           const crawler = new Crawler({
             website: self.config.website,
-            location: self.config.location,
             jobStatus: self.config.jobStatus
           })
           yield crawler.save()
@@ -25,15 +24,13 @@ class SfdaBoot {
         }
         case 'continue': {
           let crawler = yield Crawler.findOne({
-            website: self.config.website,
-            location: self.config.location
+            website: self.config.website
           })
           .exec()
 
           if (!crawler) {
             crawler = new Crawler({
               website: self.config.website,
-              location: self.config.location,
               jobStatus: self.config.jobStatus
             })
             yield crawler.save()
@@ -49,4 +46,4 @@ class SfdaBoot {
   }
 }
 
-module.exports = SfdaBoot
+module.exports = Boot

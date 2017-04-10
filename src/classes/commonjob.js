@@ -3,7 +3,7 @@ const { format } = require('util')
 const SfdaErrors = require('src/consts/errors')
 const Crawler = require('src/models/Crawler')
 const coHandler = require('src/common/co-handler')
-// const logger = require('src/common/bunyanLogger')
+const logger = require('src/common/bunyanLogger')
 
 class CommonJob {
   constructor (config) {
@@ -47,12 +47,12 @@ class CommonJob {
     return coHandler(function * () {
       const crawler = yield Crawler.findOne({
         website: self.config.website,
-        location: self.config.location
+       // location: self.config.location
       })
      .exec()
 
       if (!crawler) {
-        throw new Error(format(SfdaErrors.CAN_NOT_FIND_CRAWLER_ON_DATABASE, self.config.website, self.config.location))
+        throw new Error(format(SfdaErrors.CAN_NOT_FIND_CRAWLER_ON_DATABASE, self.config.website, self.config.website))
       }
 
       return Promise.resolve(crawler)

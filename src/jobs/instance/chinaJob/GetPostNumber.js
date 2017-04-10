@@ -11,11 +11,12 @@ const CommonJob = require('src/jobs/instance/chinaJob/common/CommonJob')
 const ERROR = require('src/consts/errors.js')
 
 const JobConst = require('src/consts/chinaJob')
-const JobCountService = require('src/services/chinaJob/CountService')
-
+// const JobCountService = require('src/services/chinaJob/CountService')
+const JobCount = require('src/models/instance/chinajob/Count')
 class GetPostNumber extends CommonJob {
   constructor (config) {
     super(config)
+    this.config = config
   }
 
   init () {
@@ -25,13 +26,13 @@ class GetPostNumber extends CommonJob {
       switch (self.config.strategy) {
         case 'restart':
           yield PostNumber.remove({
-            location: self.config.location
+            website: self.config.website
           })
           .exec()
           break
         case 'continue':
           yield PostNumber.update({
-            location: self.config.location,
+            website: self.config.website,
             crawlStatus: JobConst.CRAWL_STATUS[1]
           },
             {
@@ -52,16 +53,36 @@ class GetPostNumber extends CommonJob {
   start () {
     const self = this
     return coHandler(function * () {
-      const url = format(self.config.initUrl, 1)
-      const {postCount, totalPageCount} = yield self.getCount(url)
+      console.log('into start in chinajob getpstnumber')
+      let url = 'http://www.chinajob.com/individual/my_teacherlist.php'//format(self.config.initUrl, 1)
+      // console.log('above getcount fun; url' + url)
+      // let count = yield self.getCount('http://www.chinajob.com/individual/my_teacherlist.php')
+      // console.log('count is'+count)
+      // let {postCount, totalPageCount} = yield self.getCount(url)
 
-      let cjCount = yield JobCountService.findOne({
-        location: self.config.location
-      })
+      const html = self.getHTML('http://www.chinajob.com/individual/my_teacherlist.php', 'postList')
+      console.log('under html'+ html)
 
+      const $ = cheerio.load(yield html)
+
+      let totalPageCount = $('.pagerselect>option:last-child').attr('value').trim()
+      let postCount = $('tbody tr').text().match(/Total (\d+) Records/)[1].trim()
+      console.log(`totalPageCount: ${totalPageCount}`)
+
+
+
+      // let cjCount = yield JobCountService.findOne({
+      //   website: self.config.website
+      // }).exec()
+     
+
+      let cjCount = yield JobCount.findOne({
+        website: self.config.website
+      }).exec()
+      console.log('cjcount'+ cjCount)
       if (!cjCount) {
         cjCount = new ChinaJobCount({
-          location: self.config.location,
+          website: self.config.website,
           totalPageCount,
           postCount
         })
@@ -73,10 +94,11 @@ class GetPostNumber extends CommonJob {
         yield cjCount.save()
       }
 
-			// 从上次记录开始继续往下爬
+      // 从上次记录开始继续往下爬
       for (let pageNum = cjCount.crawledPageCount + 1; pageNum <= totalPageCount; pageNum++) {
         const url = format(self.config.initUrl, pageNum)
         const html = yield self.getHTML(url, 'postList')
+        console.log('html:' + html)
         let $ = cheerio.load(html)
 
         let hrefEles = $('form a[onfocus="if(this.blur)this.blur()"]')
@@ -96,14 +118,14 @@ class GetPostNumber extends CommonJob {
 
             if (!hrefExist) {
               let option = {
-                location: self.config.location,
+                website: self.config.website,
                 number,
                 title
                 // doneRecord: true
               }
               let href = new PostNumber(option)
               yield href.save()
-              return true
+              console.log('next iteration..')
 							// To break a $.each loop, you have to return false in the loop callback.Returning true skips to the next iteration, equivalent to a continue in a normal loop.
             }
             debug(`href number exist: ${number}`)

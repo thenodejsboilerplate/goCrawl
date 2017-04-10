@@ -17,10 +17,10 @@ const JobCountSchema = new mongoose.Schema({
   }
 })
 let JobCount
-if (mongoose.models.JobCount) {
-  JobCount = mongoose.model('JobCount')
+if (mongoose.models.ChinaJob_Count) {
+  JobCount = mongoose.model('ChinaJob_Count')
 } else {
-  JobCount = mongoose.model('JobCount', JobCountSchema)
+  JobCount = mongoose.model('ChinaJob_Count', JobCountSchema)
 }
 
 module.exports = JobCount

@@ -3,7 +3,6 @@ const mongoose = require('mongoose')
 
 const CrawlerSchema = new mongoose.Schema({
   website: String,
-  location: String,
   jobStatus: mongoose.Schema.Types.Mixed
 })
 

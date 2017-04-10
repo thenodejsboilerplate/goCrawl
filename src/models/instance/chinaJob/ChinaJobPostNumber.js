@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const CONST = require('src/consts/chinaJob')
 
 const NumSchema = new mongoose.Schema({
-  location: String,
+  website: String,
   number: {type: String, default: ''},
   title: {type: String, default: ''},
   crawlStatus: {
@@ -13,10 +13,10 @@ const NumSchema = new mongoose.Schema({
   // doneRecord: {type: Boolean, default: false}
 })
 let ChinaJobNum
-if (mongoose.models.ChinaJobHref) {
-  ChinaJobNum = mongoose.model('ChinaJobNum')
+if (mongoose.models.ChinaJob_Num) {
+  ChinaJobNum = mongoose.model('ChinaJob_Num')
 } else {
-  ChinaJobNum = mongoose.model('ChinaJobNum', NumSchema)
+  ChinaJobNum = mongoose.model('ChinaJob_Num', NumSchema)
 }
 
 module.exports = ChinaJobNum
